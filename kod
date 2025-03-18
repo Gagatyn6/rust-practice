@@ -2,32 +2,36 @@ use std::env;
 use std::fs::File;
 use std::io::{self, BufReader, BufRead};
 
-fn count_lines_in_file(file_path: &str) -> io::Result<usize> {
-    let file = File::open(file_path)?;
-    let reader = BufReader::new(file);
+/// Функція для підрахунку рядків у файлі.
+/// Повертає кількість рядків або помилку у випадку проблем із читанням файлу.
+fn підрахувати_рядки(шлях_до_файлу: &str) -> io::Result<usize> {
+    let файл = File::open(шлях_до_файлу)?; // Відкриваємо файл
+    let читач = BufReader::new(файл); // Обгортаємо у буферизований читач
     
-    let line_count = reader.lines().count();
+    let кількість = читач.lines().count(); // Рахуємо кількість рядків
     
-    Ok(line_count)
+    Ok(кількість)
 }
 
 fn main() {
-   
-    let args: Vec<String> = env::args().collect();
-    
-    if args.len() < 2 {
-        eprintln!("Будь ласка, вкажіть шлях до файлу.");
+    // Отримуємо список аргументів командного рядка
+    let аргументи: Vec<String> = env::args().collect();
+
+    // Перевіряємо, чи користувач передав шлях до файлу
+    if аргументи.len() < 2 {
+        eprintln!("Помилка: потрібно вказати шлях до файлу!");
         std::process::exit(1);
     }
 
-    let file_path = &args[1];
+    let шлях_до_файлу = &аргументи[1]; // Отримуємо шлях до файлу
 
-    match count_lines_in_file(file_path) {
-        Ok(line_count) => {
-            println!("Кількість рядків у файлі '{}': {}", file_path, line_count);
+    // Викликаємо функцію підрахунку рядків та обробляємо результат
+    match підрахувати_рядки(шлях_до_файлу) {
+        Ok(кількість) => {
+            println!("Файл '{}': містить {} рядків.", шлях_до_файлу, кількість);
         }
-        Err(e) => {
-            eprintln!("Помилка при відкритті файлу '{}': {}", file_path, e);
+        Err(помилка) => {
+            eprintln!("Не вдалося відкрити файл '{}': {}", шлях_до_файлу, помилка);
             std::process::exit(1);
         }
     }
